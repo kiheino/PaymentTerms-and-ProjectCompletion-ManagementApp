@@ -31,12 +31,20 @@ export const CompletedClaimsPopover: FC<Props> = (props) => {
 
   const { projectId } = props;
 
-  const [completionDate, setCompletionDate] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const localTime = new Date(project!.scheduledCompletionDate);
+  const [year, month, day] = [
+    localTime.getFullYear(),
+    localTime.getMonth() + 1,
+    localTime.getDate(),
+  ];
+  const formattedDate = year + "/" + month + "/" + day;
 
   const formattedContractAmount = Number(
     project?.contractAmount
   ).toLocaleString();
+
+  const [completionDate, setCompletionDate] = useState(formattedDate);
+  const [isOpen, setIsOpen] = useState(false);
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     setCompletionDate(event.target.value);
@@ -107,7 +115,6 @@ export const CompletedClaimsPopover: FC<Props> = (props) => {
           <HStack>
             <Input
               focusBorderColor="grey"
-              placeholder={project?.scheduledCompletionDate}
               onChange={onChange}
               value={completionDate}
             />

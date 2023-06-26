@@ -7,7 +7,7 @@ exports.registerCompletion = async (req, res) => {
     const { projectId, completionDate } = req.body;
     const project = await Project.findById(projectId).populate("client");
     const { cutoffDate, paymentMonth, paymentDay } = project.client;
-    const today = new Date("2023/07/07");
+    const today = new Date();
 
     const [year, month, day] = [
       today.getFullYear(),
