@@ -15,7 +15,7 @@ export type Project = {
   };
 
   contractAmount: number;
-  scheduledCompletionDate: string;
+  scheduledCompletionDate: Date;
   isCompleted: boolean;
   invoiceId: string[];
   billingAmount: {

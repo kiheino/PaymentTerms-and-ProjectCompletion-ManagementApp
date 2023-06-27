@@ -4,29 +4,32 @@ import "dayjs/locale/ja";
 import { NamedInput } from "../molecules/inputs/NamedInput";
 import { NamedSelect } from "../molecules/inputs/NamedSelect";
 import { NamedInputWithUnit } from "../molecules/inputs/NamedInputWithUnit";
-import { Group } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
+import { DateInput } from "@mantine/dates";
 import projectApi from "../../api/projectApi";
 import clientApi from "../../api/clientAPI";
 import { useDispatch } from "react-redux";
 import { refreshProjects } from "../../redux/features/homeSlice";
 import { Client } from "../../types/api/Client";
 
+type Project = {
+  projectName: string;
+  client: string;
+  scheduledCompletionDate: Date | null;
+  contractAmount: string;
+};
+
 export const InputArea: FC = memo(() => {
-  const [project, setProject] = useState({
+  const [project, setProject] = useState<Project>({
     projectName: "",
     client: "",
-    scheduledCompletionDate: "",
+    scheduledCompletionDate: null,
     contractAmount: "",
   });
   const dispatch = useDispatch();
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [clients, setClients] = useState([]);
-
   const [value, setValue] = useState<Date | null>(null);
-  const [formattedDate, setFormattedDate] = useState<string>("");
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -46,22 +49,13 @@ export const InputArea: FC = memo(() => {
     }
   };
 
-  // const clientNames = clients.map((obj) => obj.ClientName)
-
   useEffect(() => {
     if (value !== null) {
-      const [year, month, day] = [
-        value.getFullYear(),
-        value.getMonth() + 1,
-        value.getDate(),
-      ];
-      setFormattedDate(year + "/" + month + "/" + day);
       setProject((prevState) => {
-        return { ...prevState, scheduledCompletionDate: formattedDate };
+        return { ...prevState, scheduledCompletionDate: value };
       });
     }
-    setIsCalendarOpen(false);
-  }, [value, formattedDate]);
+  }, [value]);
 
   const onAdd = async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
     event.preventDefault();
@@ -71,10 +65,11 @@ export const InputArea: FC = memo(() => {
       console.log("受注が登録されました");
       console.log(res);
       dispatch(refreshProjects());
+      setValue(null);
       setProject({
         projectName: "",
         client: "",
-        scheduledCompletionDate: "",
+        scheduledCompletionDate: null,
         contractAmount: "",
       });
     } catch (err) {
@@ -87,10 +82,6 @@ export const InputArea: FC = memo(() => {
     setIsExpanded(true);
     const clients = await getClients();
     setClients(clients);
-  }
-
-  function selectDate() {
-    setIsCalendarOpen(true);
   }
 
   return (
@@ -139,34 +130,30 @@ export const InputArea: FC = memo(() => {
                 text="契約金額（税抜):"
                 textWidth={{ base: "110px", md: "125px" }}
                 name="contractAmount"
-                placeholder="200000"
                 value={project.contractAmount}
                 width="185px"
                 unitName="円"
                 onChange={handleChange}
               />
-              <NamedInput
+              <NamedSelect
                 text="完了予定日:"
                 textWidth={{ base: "110px", md: "125px" }}
-                name="scheduledcomplettionDate"
-                placeholder="2023/06/01"
-                value={project.scheduledCompletionDate}
-                width="185px"
-                onChange={handleChange}
-                onClick={selectDate}
-              />
-              {isCalendarOpen && (
-                <Group position="center" style={{ zIndex: 10 }}>
-                  <DatePicker
-                    value={value}
-                    onChange={setValue}
-                    locale="ja"
-                    firstDayOfWeek={0}
-                    allowDeselect
-                    styles={{ calendar: { zIndex: 100 } }}
-                  />
-                </Group>
-              )}
+              >
+                <DateInput
+                  name="scheduledCompletionDate"
+                  clearable
+                  valueFormat="YYYY/MM/DD"
+                  height="27px"
+                  size="xs"
+                  locale="ja"
+                  firstDayOfWeek={0}
+                  allowDeselect
+                  onChange={setValue}
+                  value={value}
+                  styles={{ input: { height: "25px", width: "185px" } }}
+                  mx="auto"
+                ></DateInput>
+              </NamedSelect>
             </>
           )}
         </VStack>

@@ -5,7 +5,6 @@ import { NumericFormat } from "react-number-format";
 type Props = {
   text: string;
   textWidth: object;
-  placeholder: string;
   unitName: string;
   name: string;
   value: string;
@@ -14,16 +13,7 @@ type Props = {
 };
 
 export const NamedInputWithUnit: FC<Props> = memo((props) => {
-  const {
-    text,
-    textWidth,
-    placeholder,
-    unitName,
-    name,
-    value,
-    width,
-    onChange,
-  } = props;
+  const { text, textWidth, unitName, name, value, width, onChange } = props;
 
   return (
     <Box>
@@ -42,7 +32,6 @@ export const NamedInputWithUnit: FC<Props> = memo((props) => {
         </Text>
         <NumericFormat
           customInput={Input}
-          placeholder={placeholder}
           height="27px"
           w={width}
           name={name}
